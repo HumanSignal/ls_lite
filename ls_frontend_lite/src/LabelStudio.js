@@ -1,5 +1,6 @@
 import { render, unmountComponentAtNode } from 'react-dom';
 import App from './components/App/App';
+import { CommentsSdk } from './stores/Comment/CommentSdk';
 import { configureStore } from './configureStore';
 import { LabelStudio as LabelStudioReact } from './Component';
 import { registerPanels } from './registerPanels';
@@ -60,6 +61,9 @@ export class LabelStudio {
     const rootElement = getRoot(this.root);
 
     this.store = store;
+
+    new CommentsSdk(this)
+
     window.Htx = this.store;
 
     render((
