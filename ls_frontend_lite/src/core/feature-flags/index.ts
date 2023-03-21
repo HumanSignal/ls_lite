@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV !== 'production' && !window.APP_SETTINGS) {
+if (process.env.NODE_ENV !== 'production' && !window.APP_SETTINGS?.feature_flags) {
   const APP_SETTINGS = window.APP_SETTINGS as Record<string, any> | undefined;
 
   const flags = (() => {
@@ -15,6 +15,7 @@ if (process.env.NODE_ENV !== 'production' && !window.APP_SETTINGS) {
         ...(APP_SETTINGS?.feature_flags ?? {}),
         ...flags,
       },
+      ...APP_SETTINGS,
     },
   });
 }

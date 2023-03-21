@@ -1,7 +1,6 @@
 import { flow, getEnv, getParent, getRoot, getSnapshot, types } from 'mobx-state-tree';
 import Utils from '../../utils';
 import { Comment } from './Comment';
-import { FF_DEV_3034, isFF } from '../../utils/feature-flags';
 
 export const CommentStore = types
   .model('CommentStore', {
@@ -10,7 +9,7 @@ export const CommentStore = types
   })
   .volatile(() => ({
     addedCommentThisSession: false,
-    commentFormSubmit: () => {},
+    commentFormSubmit: () => { },
     currentComment: '',
     inputRef: {},
     tooltipMessage: '',
@@ -60,12 +59,12 @@ export const CommentStore = types
     },
   }))
   .actions(self => {
-    function serialize({ commentsFilter, queueComments } = { commentsFilter: 'all', queueComments: false }) { 
+    function serialize({ commentsFilter, queueComments } = { commentsFilter: 'all', queueComments: false }) {
 
       const serializedComments = getSnapshot(commentsFilter === 'queued' ? self.queuedComments : self.comments);
-      
+
       return {
-        comments: queueComments ? serializedComments.map(comment => ({ id: comment.id > 0 ? comment.id * -1 : comment.id, ...comment })): serializedComments,
+        comments: queueComments ? serializedComments.map(comment => ({ id: comment.id > 0 ? comment.id * -1 : comment.id, ...comment })) : serializedComments,
       };
     }
 
@@ -84,7 +83,7 @@ export const CommentStore = types
     function setLoading(loading = null) {
       self.loading = loading;
     }
-    
+
     function setTooltipMessage(tooltipMessage) {
       self.tooltipMessage = tooltipMessage;
     }
@@ -97,11 +96,11 @@ export const CommentStore = types
       if (index > -1) {
         const snapshot = getSnapshot(comments[index]);
 
-        comments[index] = { ...snapshot, id : newComment.id || snapshot.id };
+        comments[index] = { ...snapshot, id: newComment.id || snapshot.id };
       }
     }
 
-    function removeCommentById(id)  {
+    function removeCommentById(id) {
       const comments = self.comments;
 
       const index = comments.findIndex(comment => comment.id === id);
@@ -118,7 +117,7 @@ export const CommentStore = types
 
       const now = Date.now() * -1;
 
-      const comment =  {
+      const comment = {
         id: now,
         text,
         task: self.taskId,
@@ -134,12 +133,11 @@ export const CommentStore = types
         if (newComment) {
           self.replaceId(now, newComment);
           self.setCurrentComment('');
-          // self.listComments();
         }
-      } catch(err) {
+      } catch (err) {
         self.removeCommentById(now);
         throw err;
-      } finally{ 
+      } finally {
         self.setLoading(null);
       }
     });
@@ -175,7 +173,7 @@ export const CommentStore = types
         if (mounted.current && annotation === self.annotationId) {
           self.setComments(comments);
         }
-      } catch(err) {
+      } catch (err) {
         console.error(err);
       } finally {
         if (mounted.current) {
