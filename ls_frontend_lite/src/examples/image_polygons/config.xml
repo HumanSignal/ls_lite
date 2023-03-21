@@ -4,4 +4,5 @@
     <Label value="Hello" background="red"></Label>
     <Label value="World" background="blue"></Label>  
   </PolygonLabels>
+  <Comments />
 </View>

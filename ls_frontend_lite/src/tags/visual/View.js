@@ -53,6 +53,7 @@ const Model = types
       'choices',
       'choice',
       'collapse',
+      'comments',
       'datetime',
       'number',
       'rating',
