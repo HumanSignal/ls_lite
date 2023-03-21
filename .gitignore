@@ -17,6 +17,7 @@ node_modules/
 # Backend
 backend/env3/
 backend/__pycache__
+*.sqlite3
 
 # IDEA
 .idea
