@@ -213,7 +213,11 @@ const devServer = () => {
   return (DEFAULT_NODE_ENV === 'development' && !BUILD.NO_SERVER) ? {
     devServer: {
       compress: true,
-      port: process.env.LSF_PORT ?? 3000,
+      host: '0.0.0.0',
+      port: process.env.WEB_PORT ?? 3000,
+      allowedHosts: [
+        '.csb.app'
+      ],
       static: {
         directory: path.join(__dirname, "public")
       },
@@ -222,6 +226,9 @@ const devServer = () => {
       },
       client: {
         overlay: false,
+      },
+      proxy: {
+        '/api': process.env.CODESANDBOX_HOST ? process.env.CODESANDBOX_HOST.replace('$PORT', process.env.API_PORT ?? 3001) : `http://localhost:${process.env.API_PORT ?? 3001}`
       }
     }
   } : {};
