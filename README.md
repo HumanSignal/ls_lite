@@ -1,5 +1,9 @@
 # LS Lite
 
-To start server:
+To setup project:
 
-`python manage.py runserver`
+`make setup`
+
+To start both servers (frontend + backend):
+
+`make start -j 2`
