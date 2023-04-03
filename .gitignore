@@ -53,3 +53,4 @@ e2e/output
 
 
 env/
+!/frontend/env/
