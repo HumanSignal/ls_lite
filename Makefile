@@ -13,10 +13,11 @@ setup_frontend: install_frontend_dependencies
 
 start_backend:
 	python3 manage.py runserver 0.0.0.0:${API_PORT}
-
+start_redis:
+	redis-server &> redis.log
 start_frontend:
 	cd frontend && yarn start
 
 setup: setup_backend setup_frontend
 
-start: start_frontend start_backend
+start: start_frontend start_backend start_redis
