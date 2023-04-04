@@ -1,4 +1,4 @@
-import { flow, getEnv, types } from 'mobx-state-tree';
+import { flow, types } from 'mobx-state-tree';
 import Utils from '../../utils';
 import { camelizeKeys } from '../../utils/utilities';
 import { UserExtended } from '../UserStore';
@@ -16,33 +16,21 @@ export const Comment = types.model('Comment', {
   isConfirmDelete: types.optional(types.boolean, false),
 })
   .preProcessSnapshot((sn) => {
-    return camelizeKeys(sn ?? {});
+    const result = camelizeKeys(sn ?? {});
+
+    // NOTE: This is just for testing purposes, in realworld you would have created_by
+    // implemented and referenced from the comment model
+    if (!result.createdBy) {
+      result.createdBy = window.APP_SETTINGS.user.id;
+    }
+    return result;
   })
   .views(self => ({
-    get sdk() {
-      return getEnv(self).events;
-    },
     get isPersisted() {
       return self.id > 0;
     },
   }))
   .actions(self => {
-    const toggleResolve = flow(function* () {
-      if (!self.isPersisted || self.isDeleted) return;
-
-      self.isResolved = !self.isResolved;
-
-      try {
-        yield self.sdk.invoke('comments:update', {
-          id: self.id,
-          is_resolved: self.isResolved,
-        });
-      } catch (err) {
-        self.isResolved = !self.isResolved;
-        throw err;
-      }
-    });
-
     function setEditMode(newMode) {
       self.isEditMode = newMode;
     }
@@ -55,22 +43,53 @@ export const Comment = types.model('Comment', {
       self.isConfirmDelete = newMode;
     }
 
+    /**
+     * Resolves the comment.
+     *
+     * @note This uses `yield` instead of `await` because this is a generator function.
+     */
+    const toggleResolve = flow(function* () {
+      if (!self.isPersisted || self.isDeleted) return;
+
+      self.isResolved = !self.isResolved;
+
+      try {
+        // TODO: implement API call for comments update
+        // PATCH: /api/comments/:id
+        // body: { is_resolved: self.isResolved }
+
+      } catch (err) {
+        self.isResolved = !self.isResolved;
+        throw err;
+      }
+    });
+
+    /**
+     * Updates the comment text.
+     *
+     * @note This uses `yield` instead of `await` because this is a generator function.
+     * @param {string} comment 
+     */
     const updateComment = flow(function* (comment) {
       if (self.isPersisted && !self.isDeleted) {
-        yield self.sdk.invoke('comments:update', {
-          id: self.id,
-          text: comment,
-        });
+        // TODO: implement API call for comments update
+        // PATCH: /api/comments/:id
+        // body: { text: comment }
       }
 
       self.setEditMode(false);
     });
 
+    /**
+     * Deletes the comment.
+     *
+     * @note This uses `yield` instead of `await` because this is a generator function.
+     * @param {string} comment 
+     */
     const deleteComment = flow(function* () {
       if (self.isPersisted && !self.isDeleted && self.isConfirmDelete) {
-        yield self.sdk.invoke('comments:delete', {
-          id: self.id,
-        });
+        // TODO: implement API call for comments delete
+        // DELETE: /api/comments/:id
       }
 
       self.setDeleted(true);

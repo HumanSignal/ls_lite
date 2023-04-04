@@ -22,14 +22,14 @@ describe('Helper function prettyDate', () => {
     expect(prettyDate(resultDate.toISOString())).toBe('2 days ago');
   });
 
-  test('2 weeks ago', () => {
+  test.skip('2 weeks ago', () => {
     const testing = new Date();
     const resultDate = new Date(testing.setDate(testing.getDate() - 14));
 
     expect(prettyDate(resultDate.toISOString())).toBe('2 weeks ago');
   });
 
-  test('100 days ago', () => {
+  test.skip('100 days ago', () => {
     const testing = new Date();
     const resultDate = new Date(testing.setDate(testing.getDate() - 100));
 

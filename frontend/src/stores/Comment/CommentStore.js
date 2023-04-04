@@ -1,4 +1,4 @@
-import { flow, getEnv, getParent, getRoot, getSnapshot, types } from 'mobx-state-tree';
+import { flow, getRoot, getSnapshot, types } from 'mobx-state-tree';
 import Utils from '../../utils';
 import { Comment } from './Comment';
 
@@ -15,39 +15,17 @@ export const CommentStore = types
     tooltipMessage: '',
   }))
   .views(self => ({
-    get store() {
-      return getParent(self);
-    },
-    get task() {
-      return getParent(self).task;
-    },
-    get annotation() {
-      return getParent(self).annotationStore.selected;
-    },
-    get annotationId() {
-      return isNaN(self.annotation?.pk) ? undefined : self.annotation.pk;
-    },
-    get draftId() {
-      if (!self.annotation?.draftId) return null;
-      return self.annotation.draftId;
-    },
     get currentUser() {
       return getRoot(self).user;
     },
-    get sdk() {
-      return getEnv(self).events;
-    },
     get isListLoading() {
       return self.loading === 'list';
-    },
-    get taskId() {
-      return self.task?.id;
     },
     get canPersist() {
       return true;
     },
     get isCommentable() {
-      return !self.annotation || ['annotation'].includes(self.annotation.type);
+      return true;
     },
     get queuedComments() {
       const queued = self.comments.filter(comment => !comment.isPersisted);
@@ -110,6 +88,12 @@ export const CommentStore = types
       }
     }
 
+    /**
+     * Add a comment to the store
+     *
+     * @note This uses `yield` instead of `await` because this is a generator function.
+     * @param {string} text
+     */
     const addComment = flow(function* (text) {
       if (self.loading === 'addComment') return;
 
@@ -120,7 +104,6 @@ export const CommentStore = types
       const comment = {
         id: now,
         text,
-        task: self.taskId,
         created_by: self.currentUser.id,
         created_at: Utils.UDate.currentISODate(),
       };
@@ -128,7 +111,10 @@ export const CommentStore = types
       self.comments.unshift(comment);
 
       try {
-        const [newComment] = yield self.sdk.invoke('comments:create', comment);
+        // TODO: Implement comment creation
+        // POST: /api/comments
+        // body: { text: string }
+        const newComment = null;
 
         if (newComment) {
           self.replaceId(now, newComment);
@@ -154,23 +140,26 @@ export const CommentStore = types
       }
     }
 
+    /**
+     * List comments
+     *
+     * @note This uses `yield` instead of `await` because this is a generator function.
+     * @param {object} [mounted] - whether the component is mounted
+     * @param {boolean} [suppressClearComments] - whether to stop clearing comments prior to loading
+     */
     const listComments = flow((function* ({ mounted = { current: true }, suppressClearComments } = {}) {
-
       if (!suppressClearComments) self.setComments([]);
-      if (!self.draftId && !self.annotationId) return;
 
       try {
         if (mounted.current) {
           self.setLoading('list');
         }
 
-        const annotation = self.annotationId;
-        const [comments] = yield self.sdk.invoke('comments:list', {
-          annotation,
-          draft: self.draftId,
-        });
+        // TODO: Implement comment listing
+        // GET: /api/comments
+        const comments = [];
 
-        if (mounted.current && annotation === self.annotationId) {
+        if (mounted.current) {
           self.setComments(comments);
         }
       } catch (err) {

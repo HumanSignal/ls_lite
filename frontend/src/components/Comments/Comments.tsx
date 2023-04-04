@@ -4,19 +4,15 @@ import { Block } from '../../utils/bem';
 import { CommentForm } from './CommentForm';
 import { CommentsList } from './CommentsList';
 import { useMounted } from '../../common/Utils/useMounted';
-import { FF_DEV_3034, isFF } from '../../utils/feature-flags';
 
 import './Comments.styl';
 
 
-export const Comments: FC<{ commentStore: any, cacheKey?: string }>= observer(({ commentStore, cacheKey }) => {
+export const Comments: FC<{ commentStore: any, cacheKey?: string }>= observer(({ commentStore }) => {
   const mounted = useMounted();
 
   const loadComments = async () => {
     await commentStore.listComments({ mounted });
-    if (!isFF(FF_DEV_3034)) {
-      commentStore.restoreCommentsFromCache(cacheKey);
-    }
   };
 
   useEffect(() => {
@@ -24,7 +20,7 @@ export const Comments: FC<{ commentStore: any, cacheKey?: string }>= observer(({
     // id is internal id,
     // always different for different annotations, even empty ones;
     // remain the same when user submit draft, so no unneeded calls.
-  }, [commentStore.annotation.id]);
+  }, []);
 
   useEffect(() => {
     const confirmCommentsLoss = (e: any) => {

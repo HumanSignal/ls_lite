@@ -5,6 +5,7 @@ module.exports = {
     '<rootDir>/src',
   ],
   'preset': 'ts-jest',
+  'setupFilesAfterEnv': ['./jest.setup.js'],
   'testEnvironment': 'jsdom',
   'verbose': false,
   'collectCoverageFrom': [
@@ -59,7 +60,8 @@ module.exports = {
     '^konva': 'konva/konva',
     '^keymaster': 'identity-obj-proxy',
     '^react-konva-utils': 'identity-obj-proxy',
-    '\\.(s[ac]ss|css|styl|svg|png|jpe?g)$': 'identity-obj-proxy',
+    '\\.(s[ac]ss|css|styl|png|jpe?g)$': 'identity-obj-proxy',
+    '\\.svg': '<rootDir>/src/__mocks__/svg.js',
   },
   'testPathIgnorePatterns': [
     '/node_modules/',

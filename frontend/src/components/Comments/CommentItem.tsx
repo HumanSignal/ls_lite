@@ -15,6 +15,7 @@ import { Button } from '../../common/Button/Button';
 
 interface Comment {
   comment: {
+    id: number,
     isEditMode: boolean,
     isConfirmDelete: boolean,
     createdAt: string,
@@ -24,18 +25,19 @@ interface Comment {
     createdBy: any,
     text: string,
     isResolved: boolean,
-    updateComment: (comment: string) => void,
-    deleteComment: () => void,
+    updateComment: (comment: string) => Promise<void>,
+    deleteComment: () => Promise<void>,
     setConfirmMode: (confirmMode: boolean) => void,
     setEditMode: (isGoingIntoEditMode: boolean) => void,
     toggleResolve: () => void,
   };
-  listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
+  listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => Promise<void>;
 }
 
 export const CommentItem: FC<any> = observer(
   ({
     comment: {
+      id,
       updatedAt,
       isEditMode,
       isConfirmDelete,
@@ -80,7 +82,7 @@ export const CommentItem: FC<any> = observer(
     };
 
     return (
-      <Block name="comment-item" mod={{ resolved }}>
+      <Block name="comment-item" mod={{ resolved }} data-testid={`comment:${id}`}>
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
             <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy}></Elem>
@@ -90,8 +92,8 @@ export const CommentItem: FC<any> = observer(
           </Space>
 
           <Space size="small">
-            <Elem name="resolved" component={IconCheck} />
-            <Elem name="saving" mod={{ hide: isPersisted }}>
+            <Elem name="resolved" component={IconCheck} data-testid={resolved ? 'comment-resolved': 'comment-unresolved'} />
+            <Elem name="saving" mod={{ hide: isPersisted }} data-testid={isPersisted ? 'comment-persisted': 'comment-saving'}>
               <Elem name="dot" />
             </Elem>
             <TimeTracker />
@@ -166,7 +168,7 @@ export const CommentItem: FC<any> = observer(
                   </Menu>
                 )}
               >
-                <Button size="small" type="text" icon={<IconEllipsis />} />
+                <Button size="small" type="text" icon={<IconEllipsis />} data-testid="comment-menu" />
               </Dropdown.Trigger>
             )}
           </Elem>

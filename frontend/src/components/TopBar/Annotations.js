@@ -8,9 +8,9 @@ import { isDefined, userDisplayName } from '../../utils/utilities';
 import { GroundTruth } from '../CurrentEntity/GroundTruth';
 import './Annotations.styl';
 import { TimeAgo }  from '../../common/TimeAgo/TimeAgo';
-import { reaction } from 'mobx';
+// import { reaction } from 'mobx';
 
-export const Annotations = observer(({ store, annotationStore, commentStore }) => {
+export const Annotations = observer(({ store, annotationStore, commentStore: _commentStore }) => {
   const dropdownRef = useRef();
   const [opened, setOpened] = useState(false);
   const enableAnnotations = store.hasInterface('annotations:tabs');
@@ -47,28 +47,28 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
 
     document.addEventListener('click', handleClick);
 
-    const runOnPropertyChange = (value) => {
-      let _unresolvedComments = 0;
-      let _comments = 0;
+    // const runOnPropertyChange = (value) => {
+    // let _unresolvedComments = 0;
+    // let _comments = 0;
 
-      value.forEach(obj => {
-        _comments++;
+    // value.forEach(obj => {
+    //   _comments++;
 
-        if (!obj) _unresolvedComments++;
-      });
+    //   if (!obj) _unresolvedComments++;
+    // });
 
-      commentStore.annotation.setUnresolvedCommentCount(_unresolvedComments);
-      commentStore.annotation.setCommentCount(_comments);
-    };
+    // commentStore.annotation.setUnresolvedCommentCount(_unresolvedComments);
+    // commentStore.annotation.setCommentCount(_comments);
+    // };
 
-    const reactionDisposer = reaction(
-      () => [...commentStore.comments.map(item => item.isResolved)],
-      runOnPropertyChange,
-    );
+    // const reactionDisposer = reaction(
+    //   () => [...commentStore.comments.map(item => item.isResolved)],
+    //   runOnPropertyChange,
+    // );
 
     return () => {
       document.removeEventListener('click', handleClick);
-      reactionDisposer();
+      // reactionDisposer();
     };
   }, []);
 
