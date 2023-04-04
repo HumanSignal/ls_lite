@@ -9,19 +9,22 @@ export const Comment = types.model('Comment', {
   createdAt: types.optional(types.string, Utils.UDate.currentISODate()),
   updatedAt: types.optional(types.string, Utils.UDate.currentISODate()),
   resolvedAt: types.optional(types.maybeNull(types.string), null),
-  createdBy: types.optional(types.maybeNull(types.safeReference(UserExtended)), null),
+  // createdBy: types.optional(types.maybeNull(types.safeReference(UserExtended)), null),
   isResolved: false,
   isEditMode: types.optional(types.boolean, false),
   isDeleted: types.optional(types.boolean, false),
   isConfirmDelete: types.optional(types.boolean, false),
 })
+  .volatile(() => ({
+    createdBy: null,
+  }))
   .preProcessSnapshot((sn) => {
     const result = camelizeKeys(sn ?? {});
 
     // NOTE: This is just for testing purposes, in realworld you would have created_by
     // implemented and referenced from the comment model
     if (!result.createdBy) {
-      result.createdBy = window.APP_SETTINGS.user.id;
+      result.createdBy = UserExtended.create(window.APP_SETTINGS.user);
     }
     return result;
   })

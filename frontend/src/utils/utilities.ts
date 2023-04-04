@@ -185,14 +185,14 @@ export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => 
 };
 
 export const userDisplayName = (user: any = {}) => {
-  const firstName = user.firstName ?? user.firstName;
-  const lastName = user.lastName ?? user.lastName;
+  const firstName = user?.firstName ?? user?.firstName;
+  const lastName = user?.lastName ?? user?.lastName;
 
   return (firstName || lastName)
     ? [firstName, lastName].filter(n => !!n).join(' ').trim()
-    : (user.username)
+    : (user?.username)
       ? user.username
-      : user.email;
+      : user?.email;
 };
 
 export const camelizeKeys = (object: any): Record<string, unknown> => {

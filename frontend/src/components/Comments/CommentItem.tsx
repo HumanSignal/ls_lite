@@ -44,7 +44,7 @@ export const CommentItem: FC<any> = observer(
       createdAt,
       isPersisted,
       isDeleted,
-      createdBy,
+      createdBy: _createdBy,
       text: initialComment,
       isResolved: resolved,
       updateComment,
@@ -56,6 +56,9 @@ export const CommentItem: FC<any> = observer(
     listComments,
   }: Comment) => {
     const currentUser = window.APP_SETTINGS?.user;
+    // NOTE: this is for test purposes
+    const createdBy = _createdBy ?? currentUser;
+
     const [currentComment, setCurrentComment] = useState(initialComment);
 
     if (isDeleted) return null;
@@ -140,7 +143,7 @@ export const CommentItem: FC<any> = observer(
                 content={(
                   <Menu size="auto">
                     <Menu.Item onClick={toggleResolve}>{resolved ? 'Unresolve' : 'Resolve'}</Menu.Item>
-                    {currentUser?.id === createdBy.id && (
+                    {createdBy?.id && currentUser?.id === createdBy?.id && (
                       <>
                         <Menu.Item
                           onClick={() => {

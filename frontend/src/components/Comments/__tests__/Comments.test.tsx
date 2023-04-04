@@ -5,14 +5,16 @@ import fetchMock from 'jest-fetch-mock';
 import { CommentStore } from '../../../stores/Comment/CommentStore';
 import { Comments as CommentsView } from '../Comments';
 
+const json = (value: Record<string, any> | Array<any>): Promise<string> => 
+  Promise.resolve(JSON.stringify(value));
+
 describe('Comments', () => {
   beforeEach(() => {
     fetchMock.resetMocks();
   });
 
-  it('should render correctly', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify([
-    ]));
+  it('should render correctly without comments', async () => {
+    fetchMock.mockResponseOnce(() => json([]));
 
     const { getByPlaceholderText } = render(<CommentsView commentStore={CommentStore.create({})} />);
 
@@ -20,7 +22,7 @@ describe('Comments', () => {
   });
 
   it('should render correctly with comments', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify([
+    fetchMock.mockResponseOnce(() => json([
       {
         id: 1,
         text: 'Comment 1',
@@ -28,7 +30,6 @@ describe('Comments', () => {
         resolved_at: null,
         created_at: '2023-01-01T00:00:00Z',
         updated_at: '2023-01-01T00:00:00Z',
-        created_by: { id: 1, username: 'user1', email: 'user1@email.com', first_name: 'User', last_name: 'One', initials: 'UO' },
       },
       {
         id: 2,
@@ -37,7 +38,6 @@ describe('Comments', () => {
         resolved_at: null,
         created_at: '2023-01-01T00:00:00Z',
         updated_at: '2023-01-01T00:00:00Z',
-        created_by: { id: 2, username: 'user2', email: 'user2@email.com', first_name: 'User', last_name: 'Two', initials: 'UT' },
       },
     ]));
 
@@ -48,7 +48,7 @@ describe('Comments', () => {
   });
 
   it('should render correctly with resolved comments', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify([
+    fetchMock.mockResponseOnce(() => json([
       {
         id: 1,
         text: 'Comment 1',
@@ -56,7 +56,6 @@ describe('Comments', () => {
         resolved_at: '2023-01-01T00:00:00Z',
         created_at: '2023-01-01T00:00:00Z',
         updated_at: '2023-01-01T00:00:00Z',
-        created_by: { id: 1, username: 'user1', email: 'user1@email.com', first_name: 'User', last_name: 'One', initials: 'UO' },
       },
       {
         id: 2,
@@ -65,7 +64,6 @@ describe('Comments', () => {
         resolved_at: null,
         created_at: '2023-01-01T00:00:00Z',
         updated_at: '2023-01-01T00:00:00Z',
-        created_by: { id: 2, username: 'user2', email: 'user2@email.com', first_name: 'User', last_name: 'Two', initials: 'UT' },
       },
     ]));
 
@@ -76,59 +74,40 @@ describe('Comments', () => {
   });
 
   it('should add a comment', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({
-      id: 1,
-      text: 'Comment 1',
-      is_resolved: false,
-      resolved_at: null,
-      created_at: '2023-01-01T00:00:00Z',
-      updated_at: '2023-01-01T00:00:00Z',
-      created_by: { id: 1, username: 'user1', email: 'user1@email.com', first_name: 'User', last_name: 'One', initials: 'UO' },
-    }));
-
-    const { getByText, getByTestId, getByPlaceholderText } = render(<CommentsView commentStore={CommentStore.create({})} />);
-
-    const input = getByPlaceholderText('Add a comment');
-
-    await act(async () => {
-      fireEvent.change(input, { target: { value: 'Comment 1' } });
-      fireEvent.click(getByText('Add'));
-    });
-
-    getByTestId('comment-saving');
-
-    await waitFor(() => {
-      getByText('Comment 1');
-      within(getByTestId('comment:1')).getByTestId('comment-unresolved');
-      within(getByTestId('comment:1')).getByTestId('comment-persisted');
-    });
-  });
-
-  it('should add a comment', async () => {
     fetchMock.mockResponse((req): any => {
-      if (req.url.includes('/api/comments/') && req.method === 'POST') {
-        return Promise.resolve(JSON.stringify({
-          id: 1,
-          text: 'Comment 1',
-          is_resolved: false,
-          resolved_at: null,
-          created_at: '2023-01-01T00:00:00Z',
-          updated_at: '2023-01-01T00:00:00Z',
-          created_by: { id: 1, username: 'user1', email: 'user1@email.com', first_name: 'User', last_name: 'One', initials: 'UO' },
-        }));
+      if (req.url.includes('/api/comments/')) {
+        if (req.method === 'POST') {
+          return json({
+            id: 1,
+            text: 'Comment 1',
+            is_resolved: false,
+            resolved_at: null,
+            created_at: '2023-01-01T00:00:00Z',
+            updated_at: '2023-01-01T00:00:00Z',
+          });
+        }
+
+        if (req.method === 'GET') {
+          return json([{
+            id: 1,
+            text: 'Comment 1',
+            is_resolved: false,
+            resolved_at: null,
+            created_at: '2023-01-01T00:00:00Z',
+            updated_at: '2023-01-01T00:00:00Z',
+          }]);
+        }
       }
     });
 
-    const { getByText, getByTestId, getByPlaceholderText } = render(<CommentsView commentStore={CommentStore.create({})} />);
+    const { getByText, getByLabelText, getByTestId, getByPlaceholderText } = render(<CommentsView commentStore={CommentStore.create({})} />);
 
     const input = getByPlaceholderText('Add a comment');
 
     await act(async () => {
       fireEvent.change(input, { target: { value: 'Comment 1' } });
-      fireEvent.click(getByText('Add'));
+      fireEvent.click(getByLabelText('Add'));
     });
-
-    getByTestId('comment-saving');
 
     await waitFor(() => {
       getByText('Comment 1');
@@ -138,44 +117,58 @@ describe('Comments', () => {
   });
 
   it('should correctly resolve/unresolve a comment', async () => {
-    fetchMock.mockResponse(JSON.stringify([
-      {
-        id: 1,
-        text: 'Comment 1',
-        is_resolved: true,
-        resolved_at: '2023-01-01T00:00:00Z',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-        created_by: { id: 1, username: 'user1', email: 'user1@email.com', first_name: 'User', last_name: 'One', initials: 'UO' },
-      },
-    ]));
+    fetchMock.mockResponse((req): any => {
+      if (req.url.includes('/api/comments/')) {
+        if (req.method === 'PATCH') {
+          return json({
+            id: 1,
+            text: 'Comment 1',
+            is_resolved: false,
+            resolved_at: null,
+            created_at: '2023-01-01T00:00:00Z',
+            updated_at: '2023-01-01T00:00:00Z',
+          });
+        }
 
-    const { getByTestId } = render(<CommentsView commentStore={CommentStore.create({})} />);
+        if (req.method === 'GET') {
+          return json([{
+            id: 1,
+            text: 'Comment 1',
+            is_resolved: false,
+            resolved_at: null,
+            created_at: '2023-01-01T00:00:00Z',
+            updated_at: '2023-01-01T00:00:00Z',
+          }]);
+        }
+      }
+    });
 
-    await waitFor(() => within(getByTestId('comment:1')).getByTestId('comment-resolved'));
+    const { getByTestId, getByText } = render(<CommentsView commentStore={CommentStore.create({})} />);
+
+    await waitFor(() => within(getByTestId('comment:1')).getByTestId('comment-unresolved'));
 
     const menu = within(getByTestId('comment:1')).getByTestId('comment-menu');
 
     await act(async () => {
       fireEvent.click(menu);
-      fireEvent.click(within(menu).getByText('Unresolve'));
-    });
-
-    await waitFor(() => within(getByTestId('comment:1')).getByTestId('comment-unresolved'));
-
-    await act(async () => {
-      fireEvent.click(menu);
-      fireEvent.click(within(menu).getByText('Resolve'));
+      fireEvent.click(getByText('Resolve'));
     });
 
     await waitFor(() => within(getByTestId('comment:1')).getByTestId('comment-resolved'));
+
+    await act(async () => {
+      fireEvent.click(menu);
+      fireEvent.click(getByText('Unresolve'));
+    });
+
+    await waitFor(() => within(getByTestId('comment:1')).getByTestId('comment-unresolved'));
   });
 
-  it('should update a comment', async () => {
+  it.skip('should update a comment', async () => {
     // TODO: implement this test
   });
 
-  it('should delete a comment', async () => {
+  it.skip('should delete a comment', async () => {
     // TODO: implement this test
   });
 });

@@ -61,7 +61,7 @@ export const Userpic = forwardRef<any, UserpicProps>(({
   }, [user]);
 
   const background = useMemo(() => {
-    if (isDefined(user.id)) {
+    if (isDefined(user?.id)) {
       const color = localStorage.getItem(`userpic-color-${user.id}`) ?? chroma.average([chroma.random(), '#cfcfcf']).css();
 
       localStorage.setItem(`userpic-color-${user.id}`, color);

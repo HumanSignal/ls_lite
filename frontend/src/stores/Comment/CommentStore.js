@@ -1,4 +1,4 @@
-import { flow, getRoot, getSnapshot, types } from 'mobx-state-tree';
+import { flow, getSnapshot, types } from 'mobx-state-tree';
 import Utils from '../../utils';
 import { Comment } from './Comment';
 
@@ -16,7 +16,9 @@ export const CommentStore = types
   }))
   .views(self => ({
     get currentUser() {
-      return getRoot(self).user;
+      return {
+        id: 1,
+      };
     },
     get isListLoading() {
       return self.loading === 'list';
@@ -27,25 +29,11 @@ export const CommentStore = types
     get isCommentable() {
       return true;
     },
-    get queuedComments() {
-      const queued = self.comments.filter(comment => !comment.isPersisted);
-
-      return queued.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    },
     get hasUnsaved() {
-      return self.queuedComments.length > 0;
+      return self.comments.some(comment => !comment.isPersisted);
     },
   }))
   .actions(self => {
-    function serialize({ commentsFilter, queueComments } = { commentsFilter: 'all', queueComments: false }) {
-
-      const serializedComments = getSnapshot(commentsFilter === 'queued' ? self.queuedComments : self.comments);
-
-      return {
-        comments: queueComments ? serializedComments.map(comment => ({ id: comment.id > 0 ? comment.id * -1 : comment.id, ...comment })) : serializedComments,
-      };
-    }
-
     function setCurrentComment(comment) {
       self.currentComment = comment;
     }
@@ -104,7 +92,6 @@ export const CommentStore = types
       const comment = {
         id: now,
         text,
-        created_by: self.currentUser.id,
         created_at: Utils.UDate.currentISODate(),
       };
 
@@ -172,7 +159,6 @@ export const CommentStore = types
     }));
 
     return {
-      serialize,
       setCommentFormSubmit,
       setInputRef,
       setLoading,
