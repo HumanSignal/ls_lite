@@ -4,6 +4,6 @@ To setup project:
 
 `make setup`
 
-To start both servers (frontend + backend):
+To start servers (frontend + backend + redis):
 
-`make start -j 2`
+`make start -j 3`
