@@ -17,8 +17,6 @@ start_worker:
 	python3 manage.py rqworker critical high default low
 start_redis:
 	redis-server &> redis.log
-start_frontend:
-	cd frontend && yarn start
 
 setup: setup_backend setup_frontend
 
