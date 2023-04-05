@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +26,80 @@ SECRET_KEY = 'django-insecure-of!nd%8wc(*rv!smz=85_r)krsruzyja6gvf3%6)g#k8-t3b35
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+def bool_from_request(params, key, default):
+    """Get boolean value from request GET, POST, etc
+    :param params: dict POST, GET, etc
+    :param key: key to find
+    :param default: default value
+    :return: boolean
+    """
+    value = params.get(key, default)
+
+    if isinstance(value, str):
+        value = cast_bool_from_str(value)
+
+    return bool(int(value))
+
+
+def cast_bool_from_str(value):
+    if isinstance(value, str):
+        if value.lower() in ['true', 'yes', 'on', '1']:
+            value = True
+        elif value.lower() in ['false', 'no', 'not', 'off', '0']:
+            value = False
+        else:
+            raise ValueError(
+                f'Incorrect bool value "{value}". '
+                f'It should be one of [1, 0, true, false, yes, no]'
+            )
+    return value
+
+
+def get_env(name, default=None, is_bool=False):
+    for env_key in ['LABEL_STUDIO_' + name, 'HEARTEX_' + name, name]:
+        value = os.environ.get(env_key)
+        if value is not None:
+            if is_bool:
+                return bool_from_request(os.environ, env_key, default)
+            else:
+                return value
+    return default
+
+
 ALLOWED_HOSTS = [
     '.localhost',
     '127.0.0.1',
     '[::1]',
     '.csb.app',
 ]
+
+RQ_QUEUES = {
+    'critical': {
+        'HOST': get_env('REDIS_HOST', 'localhost'),
+        'PORT': get_env('REDIS_PORT', '6379'),
+        'DB': get_env('REDIS_DB', 0),
+        'DEFAULT_TIMEOUT': 180
+    },
+    'high': {
+        'HOST': get_env('REDIS_HOST', 'localhost'),
+        'PORT': get_env('REDIS_PORT', '6379'),
+        'DB': get_env('REDIS_DB', 0),
+        'DEFAULT_TIMEOUT': 180
+    },
+    'default': {
+        'HOST': get_env('REDIS_HOST', 'localhost'),
+        'PORT': get_env('REDIS_PORT', '6379'),
+        'DB': get_env('REDIS_DB', 0),
+        'DEFAULT_TIMEOUT': 180
+    },
+    'low': {
+        'HOST': get_env('REDIS_HOST', 'localhost'),
+        'PORT': get_env('REDIS_PORT', '6379'),
+        'DB': get_env('REDIS_DB', 0),
+        'DEFAULT_TIMEOUT': 180
+    },
+}
 
 
 # Application definition
@@ -43,6 +112,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_rq',
     'comments',
 ]
 

@@ -13,6 +13,8 @@ setup_frontend: install_frontend_dependencies
 
 start_backend:
 	python3 manage.py runserver 0.0.0.0:${API_PORT}
+start_worker:
+	python3 manage.py rqworker critical high default low
 start_redis:
 	redis-server &> redis.log
 start_frontend:
