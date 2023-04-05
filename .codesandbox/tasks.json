@@ -10,7 +10,7 @@
     },
     "make start": {
       "name": "make start",
-      "command": "make start -j 3",
+      "command": "make start -j 4",
       "runAtStart": true
     }
   }

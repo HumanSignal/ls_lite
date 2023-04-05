@@ -22,4 +22,4 @@ start_frontend:
 
 setup: setup_backend setup_frontend
 
-start: start_frontend start_backend start_redis
+start: start_frontend start_backend start_redis start_worker
