@@ -10,6 +10,13 @@ def hello_func():
     return
 
 
+def resize(photo: bytes, width: int, height: int) -> bytes:
+    import time
+    time.sleep(height/100)
+    resized_photo = photo
+    return resized_photo
+
+
 def start_job(job, *args, **kwargs):
     queue = django_rq.get_queue(queue_name)
     enqueue_method = queue.enqueue

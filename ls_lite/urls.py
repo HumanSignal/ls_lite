@@ -8,6 +8,7 @@ from comments import api
 app_name = 'comments'
 router = DefaultRouter()
 router.register(r"comments", api.CommentAPI, basename="comments")
+router.register(r"photos", api.PhotoAPI, basename="photos")
 router.register(r"status", api.StatusAPI, basename="status")
 
 
