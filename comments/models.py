@@ -36,3 +36,22 @@ class Comment(models.Model):
         null=True, default=None,
         help_text='Resolving time',
     )
+
+    picture = models.FileField(upload_to='photo', null=True)
+
+
+class Photo(models.Model):
+    picture = models.FileField(upload_to='photo', null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
+
+    created_at = models.DateTimeField(
+        _('created at'),
+        auto_now_add=True,
+        help_text='Creation time',
+    )
+
+    updated_at = models.DateTimeField(
+        _('updated at'),
+        auto_now=True,
+        help_text='Last updated time'
+    )

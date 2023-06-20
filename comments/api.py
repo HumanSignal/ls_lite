@@ -1,7 +1,7 @@
 import logging
 from rest_framework import viewsets
-from comments.serializers import CommentSerializer
-from comments.models import Comment
+from comments.serializers import CommentSerializer, PhotoSerializer
+from comments.models import Comment, Photo
 from django.http import JsonResponse
 from comments.functions import start_job, hello_func
 
@@ -13,8 +13,12 @@ class CommentAPI(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
 
-class StatusAPI(viewsets.ViewSet):
+class PhotoAPI(viewsets.ModelViewSet):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
 
+
+class StatusAPI(viewsets.ViewSet):
 
     def list(self, request):
         start_job(hello_func)
